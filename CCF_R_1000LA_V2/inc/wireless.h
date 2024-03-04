@@ -31,5 +31,9 @@ void RF_Level_Set(uchar att_sel, uchar rf_db);
 void RF_Level_Init(void);
 
 
+void Wireless_Mute(uchar mute);
+void Wireless_Boot_Level_Set(void);
+void Wireless_Detect_Ground(uchar direct);
+
 
 #endif

@@ -1,3 +1,5 @@
+#ifndef __DEFINES_H__
+#define __DEFINES_H__
 
 typedef signed char			schar;
 typedef unsigned char		uchar;
@@ -22,6 +24,22 @@ typedef unsigned long		ulong;
 
 
 
+
+//=============== Systen Menu Define ===========================================
+#define SYS_INIT			0x01
+#define SYS_BOOT_INIT		0x02
+#define SYS_TOPMENU			0x04
+#define SYS_SET_WAIT		0x05
+
+#define SYS_REBOOT			0x0C
+#define SYS_ERROR_REBOOT	0x0D
+
+#define SYS_ERROR			0x0F
+
+#define SYS_MAIN			0x10
+#define SYS_SET_MENU		0x11
+
+
 //=============== Systen Parameters Define =====================================
 // Direction Select
 #define REVERSE_SEL			0
@@ -36,7 +54,34 @@ typedef unsigned long		ulong;
 #define FM_AGC				5
 #define FORWARD_AGC			7
 
+//=============== System Sub Define ============================================
+#define SUB_MENU1			0
+#define SUB_MENU2			1
+#define SUB_MENU3			2
+#define SUB_MENU4			3
+#define SUB_MENU5			4
+#define SUB_MENU6			5
+#define SUB_MENU7			6
+#define SUB_MENU8			7
+#define SUB_MENU9			8
+#define SUB_MENU10			9
+#define SUB_MENU11			10
+#define SUB_MENU12			11
+#define SUB_MENU13			12
+#define SUB_MENU14			13
+#define SUB_MENU15			14
+#define SUB_MENU16			15
 
+#define RX_AGC_EN			1		//0
+#define FM_RUN_EN			1
+
+#define	WIRELESS_DEBUG_EN	0
+#define FM_DEB_EN			0
+
+#define MIN_UNLOCK_CNT		10		// 100 ms
+#define MAX_UNLOCK_CNT		300		// 3000 ms
+#define DEFAULT_UNLOCK_CNT	30		// 300 ms
+////////////////////////////////////////////////////////////////
 
 
 
@@ -76,4 +121,26 @@ typedef struct
 	uint	Unlock_Cnt;
 } Wireless_Param;
 
+typedef struct
+{
+	bool	Debug_Max_Unlock_Cnt_En;
+	bool	Debug_Dsp_En;
+	ulong	Debug_Flag;
+
+	uchar	Version;
+
+	uchar	WL_Check_Sel;
+	uchar	Direction;
+
+	uint	DCV_Value;
+
+	uchar	Main_Flag;
+	uchar	Main_Sub_Flag;
+
+	uint	Max_Unlock_Cnt;
+} System_Param;
+
+
+
+#endif
 

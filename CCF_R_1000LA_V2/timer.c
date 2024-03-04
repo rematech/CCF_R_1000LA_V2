@@ -3,8 +3,6 @@
 
 #include "inc/board.h"
 
-SysTime_Param	Systime;
-
 
 #define CLK					16000000
 #define PRESCALE			1024

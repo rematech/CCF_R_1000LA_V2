@@ -141,3 +141,20 @@ void Init_MCU(void)
 
 	//all peripherals are now initialized
 }
+
+void Init_System(void)
+{
+	FWD_LED_OFF;
+	REV_LED_OFF;
+	FM_LED_OFF;
+
+	printf("\n\n\rSystem>> CCF-1000LA Init...\n\n\r");
+
+	Wireless_Mute(WL_MUTE_ON);
+	
+}
+
+
+
+
+

@@ -11,15 +11,20 @@
 
 
 
+SysTime_Param	Systime;
 Wireless_Param	Fwd;
 Wireless_Param	Rev;
+System_Param	Sys;
 
 int main(void)
 {
 	Init_MCU();
+	Init_System();
 
     while (1) 
     {
+		if (Sys.Debug_Flag)	
+			Command_Check();
 		
     }
 }
