@@ -1,4 +1,4 @@
-#include "inc/board.h"
+#include "board.h"
 
 void Adc_Init(void)
 {
@@ -42,7 +42,9 @@ uint Agc_Read(uchar channel)
 
 void AGC_All_Read(void)
 {
-	Fwd.Adc_Value = Agc_Read(FORWARD_AGC);
-	Rev.Adc_Value = Agc_Read(REVERSE_AGC);
+	//Fwd.Adc_Value = Agc_Read(FORWARD_AGC);
+	//Rev.Adc_Value = Agc_Read(REVERSE_AGC);
+
+	//FM.Adc_Value = Agc_Read(FM_AGC);
 }
 

@@ -2,6 +2,33 @@
 #define __INITIAL_H__
 
 
+
+
+// PORT의 비트를 설정하는 매크로
+#define SET_BIT(port, bit) 				(port |= (1 << bit))
+
+// PORT의 비트를 지우는 매크로
+#define CLEAR_BIT(port, bit) 			(port &= ~(1 << bit))
+
+
+typedef enum
+{
+	SWMODE_RF2,
+	SWMODE_RF1,
+} SWITCH_MODE;
+	
+void setSwitch_FWD1(BOOL bRF1);
+void setSwitch_FWD2(BOOL bRF1);
+void setSwitch_REV1(BOOL bRF1);
+void setSwitch_REV2(BOOL bRF1);
+
+void setLED_FWD(BOOL bLEDOn);
+void setLED_REV(BOOL bLEDOn);
+void setLED_FM(BOOL bLEDOn);
+
+
+
+#if 0
 // Direction Select
 //#define DIRECTION_REVERSE		PORTC &= ~Bit6
 //#define DIRECTION_FORWARD		PORTC |= Bit6
@@ -87,6 +114,8 @@
 // AGC Ground
 #define FWD_SET_GND				PORTB &= ~Bit7
 #define REV_SET_GND				PORTB &= ~Bit6
+
+#endif
 
 
 void Init_MCU(void);

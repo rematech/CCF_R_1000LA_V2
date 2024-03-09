@@ -1,7 +1,9 @@
-#include "inc/board.h"
+#include "board.h"
 
 void Eep_1st_Write(void)
 {
+
+#if 0
 	Eep_Write(EEP_1st_Addr, EEP_1st_DATA);
 
 	Eep_Write(EEP_Ver_Addr, Sys.Version);
@@ -27,10 +29,12 @@ void Eep_1st_Write(void)
 
 	Eep_Write(EEP_MAX_UNLOCK_CNT_Addr0, (uchar)(Sys.Max_Unlock_Cnt>>8));
 	Eep_Write(EEP_MAX_UNLOCK_CNT_Addr1, (uchar)Sys.Max_Unlock_Cnt);
+#endif
 }
 
 void Eep_Data_Read(void)
 {
+#if 0
 	Sys.Version = Eep_Read(EEP_Ver_Addr);
 
 	Fwd.Det_Level = ((uint)Eep_Read(EEP_WIRELESS_FWD_DET_LEVEL_Addr0)<<8) | (uint)Eep_Read(EEP_WIRELESS_FWD_DET_LEVEL_Addr1);
@@ -46,6 +50,7 @@ void Eep_Data_Read(void)
 #endif
 
 	Sys.Max_Unlock_Cnt = ((uint)Eep_Read(EEP_MAX_UNLOCK_CNT_Addr0)<<8) | (uint)Eep_Read(EEP_MAX_UNLOCK_CNT_Addr1);
+#endif
 }
 
 uchar Eep_Read(uint Addr)

@@ -2,7 +2,7 @@
   Prototypes for USART functions
 ***************************************************/
 
-#include "inc/board.h"
+#include "board.h"
 
 #define U2XN0 1
 #define U2XN1 1
@@ -125,11 +125,13 @@ void Putstr1(uchar *str)
 //*****************************************************************************
 //*************************    UART End    ***********************************
 //*****************************************************************************
+#if 0
 static void put_one_char(char c, void *dummy)
 {
   Putchar1 (c);
   (void)dummy;  /* Warning on this line OK (Optimized Away) */
 }
+#endif
 
 char g_ucPrintBuf[256];
 int printf(const char *format, ...)                    /* Our main entry */

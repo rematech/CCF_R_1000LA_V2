@@ -1,6 +1,8 @@
 #ifndef __COMMAND_H__
 #define __COMMAND_H__
 
+
+#if 0
 #define DEBUG_FWD_DET_LVL_FLAG		0x00001
 #define DEBUG_REV_DET_LVL_FLAG		0x00002
 #define DEBUG_FWD_AGC_DET_FLAG		0x00004
@@ -43,6 +45,7 @@ void Factory_Init(void);
 void Debug_Help_Dsp(void);
 void Agc_Display(void);
 void Debug_Path_Open(void);
+#endif
 
 
 #endif

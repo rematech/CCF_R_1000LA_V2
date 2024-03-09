@@ -1,6 +1,6 @@
-#include "inc/board.h"
+#include "board.h"
 
-
+GlobalData g_Data;
 void Init_MCU(void)
 {
 	// Timer/Counter 0 initialization
@@ -119,7 +119,7 @@ void Init_MCU(void)
 
 	// Port E
 	PORTE = 0xFF;
-	DDRE  = 0x61;
+	DDRE  = 0x67;
 
 	// Port F
 	//PORTF = 0x0F;
@@ -135,7 +135,7 @@ void Init_MCU(void)
 	Uart1_Init();
 	Adc_Init();
 
-	RF_Level_Init();
+	//RF_Level_Init();
 
 	SEI;	//re-enable interrupts
 
@@ -144,6 +144,7 @@ void Init_MCU(void)
 
 void Init_System(void)
 {
+#if 0
 	FWD_LED_OFF;
 	REV_LED_OFF;
 	FM_LED_OFF;
@@ -151,10 +152,91 @@ void Init_System(void)
 	printf("\n\n\rSystem>> CCF-1000LA Init...\n\n\r");
 
 	Wireless_Mute(WL_MUTE_ON);
-	
+#endif
+}
+
+void Factory_Reset_Data(void)
+{
+#if 1
+	g_Data.uiLock_count = 30;
+	g_Data.uiUnlock_count = 30;
+#else
+	Sys.Version = Main_SW_VER;
+
+	Fwd.Det_Level = WIRELESS_FWD_DET_LEVEL;
+	Fwd.Agc_Det_Level = WIRELESS_FWD_AGC_DET_LEVEL;
+	Fwd.Agc_Out_Level = WIRELESS_FWD_AGC_OUT_LEVEL;
+
+	Rev.Det_Level = WIRELESS_REV_DET_LEVEL;
+	Rev.Agc_Det_Level = WIRELESS_REV_AGC_DET_LEVEL;
+	Rev.Agc_Out_Level = WIRELESS_REV_AGC_OUT_LEVEL;
+
+	FM.Agc_Level = FM_AGC_LEVEL;
+
+	Sys.Max_Unlock_Cnt = DEFAULT_UNLOCK_CNT;
+
+	Eep_1st_Write();
+#endif
 }
 
 
+
+///////////
+void setSwitch_FWD1(BOOL bRF1)
+{
+	if(bRF1)
+		SET_BIT(PORTE, 5);
+	else
+		CLEAR_BIT(PORTE, 5);
+}
+
+void setSwitch_FWD2(BOOL bRF1)
+{
+	if(bRF1)
+		SET_BIT(PORTB, 3);
+	else
+		CLEAR_BIT(PORTB, 3);
+}
+
+void setSwitch_REV1(BOOL bRF1)
+{
+	if(bRF1)
+		SET_BIT(PORTE, 6);
+	else
+		CLEAR_BIT(PORTE, 6);
+}
+
+void setSwitch_REV2(BOOL bRF1)
+{
+	if(bRF1)
+		SET_BIT(PORTB, 4);
+	else
+		CLEAR_BIT(PORTB, 4);
+}
+
+void setLED_FWD(BOOL bLEDOn)
+{
+	if(bLEDOn)
+		SET_BIT(PORTE, 0);
+	else
+		CLEAR_BIT(PORTE, 0);
+}
+
+void setLED_REV(BOOL bLEDOn)
+{
+	if(bLEDOn)
+		SET_BIT(PORTE, 1);
+	else
+		CLEAR_BIT(PORTE, 1);
+}
+
+void setLED_FM(BOOL bLEDOn)
+{
+	if(bLEDOn)
+		SET_BIT(PORTE, 2);
+	else
+		CLEAR_BIT(PORTE, 2);
+}
 
 
 

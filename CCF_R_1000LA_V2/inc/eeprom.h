@@ -1,6 +1,8 @@
 #ifndef __EEPROM_H__
 #define __EEPROM_H__
 
+
+#if 0
 // EEPROM Define
 #define EEP_1st_Addr							0x000
 #define EEP_Ver_Addr							0x001
@@ -26,6 +28,11 @@
 #define EEP_MAX_UNLOCK_CNT_Addr1				0x041
 
 #define EEP_1st_DATA							0xA5
+#endif
+
+
+
+
 
 void Eep_1st_Write(void);
 void Eep_Data_Read(void);

@@ -8,7 +8,8 @@
 #include <stdbool.h>
 #include <math.h>
 #include <stdarg.h>
-
+#include <stdbool.h>
+	
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
@@ -28,17 +29,19 @@
 
 
 
+#define Main_SW_VER			0x2C
 
 
 #define USE_FM				0
 
-
-
 extern SysTime_Param		Systime;
+
+#if 0
 extern Wireless_Param		Fwd;
 extern Wireless_Param		Rev;
 extern System_Param			Sys;
-
+extern FM_Param				FM;
+#endif
 
 
 
