@@ -1,4 +1,4 @@
-#include "inc/board.h"
+#include "board.h"
 
 
 void Init_MCU(void)
@@ -154,6 +154,24 @@ void Init_System(void)
 	
 }
 
+void Factory_Reset_Data(void)
+{
+	Sys.Version = Main_SW_VER;
+
+	Fwd.Det_Level = WIRELESS_FWD_DET_LEVEL;
+	Fwd.Agc_Det_Level = WIRELESS_FWD_AGC_DET_LEVEL;
+	Fwd.Agc_Out_Level = WIRELESS_FWD_AGC_OUT_LEVEL;
+
+	Rev.Det_Level = WIRELESS_REV_DET_LEVEL;
+	Rev.Agc_Det_Level = WIRELESS_REV_AGC_DET_LEVEL;
+	Rev.Agc_Out_Level = WIRELESS_REV_AGC_OUT_LEVEL;
+
+	FM.Agc_Level = FM_AGC_LEVEL;
+
+	Sys.Max_Unlock_Cnt = DEFAULT_UNLOCK_CNT;
+
+	Eep_1st_Write();
+}
 
 
 

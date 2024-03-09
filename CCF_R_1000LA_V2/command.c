@@ -1,8 +1,14 @@
-#include "inc/board.h"
+#include "board.h"
+
+void USART1_RXC_interrupt(void);
+ISR(USART0_RX_vect)
+{
+	USART1_RXC_interrupt();
+}
 
 //--------------------[ Uart Function ]-------------------------------------
-#pragma vector = USART1_RXC_vect
-__interrupt void USART1_RXC_interrupt(void)
+//#pragma vector = USART1_RXC_vect
+void USART1_RXC_interrupt(void)
 {
 	uchar temp;
 //	CLI;
@@ -101,6 +107,7 @@ void Command_Check(void)
 	if (Sys.Debug_Flag & DEBUG_INIT_FLAG)		Factory_Init();
 	if (Sys.Debug_Flag & DEBUG_HELP_FLAG)		Debug_Help_Dsp();
 }
+
 
 void Debug_Forward_Det_Level(void)
 {

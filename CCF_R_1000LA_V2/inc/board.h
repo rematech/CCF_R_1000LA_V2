@@ -28,6 +28,7 @@
 
 
 
+#define Main_SW_VER			0x2C
 
 
 #define USE_FM				0
@@ -38,6 +39,7 @@ extern SysTime_Param		Systime;
 extern Wireless_Param		Fwd;
 extern Wireless_Param		Rev;
 extern System_Param			Sys;
+extern FM_Param				FM;
 
 
 

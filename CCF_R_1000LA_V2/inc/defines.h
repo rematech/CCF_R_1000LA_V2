@@ -140,6 +140,21 @@ typedef struct
 	uint	Max_Unlock_Cnt;
 } System_Param;
 
+typedef struct
+{
+	bool	Debug_Att_En;
+
+	bool	Agc_En;
+	bool	Att_Up_En;
+	bool	Att_Down_En;
+
+	uint	Adc_Value;
+	uchar	Att_1st_dB;
+	uchar	Att_2nd_dB;
+
+	uint	Agc_Level;
+} FM_Param;
+
 
 
 #endif

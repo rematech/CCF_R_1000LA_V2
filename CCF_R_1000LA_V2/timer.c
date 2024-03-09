@@ -1,7 +1,7 @@
 
 
 
-#include "inc/board.h"
+#include "board.h"
 
 
 #define CLK					16000000

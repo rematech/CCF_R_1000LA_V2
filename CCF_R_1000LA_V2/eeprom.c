@@ -1,4 +1,4 @@
-#include "inc/board.h"
+#include "board.h"
 
 void Eep_1st_Write(void)
 {

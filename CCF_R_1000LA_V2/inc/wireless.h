@@ -35,5 +35,18 @@ void Wireless_Mute(uchar mute);
 void Wireless_Boot_Level_Set(void);
 void Wireless_Detect_Ground(uchar direct);
 
+void Wireless_Direction_Set(uchar direct);
+
+void Wireless_Check(void);
+void Wireless_Forward_Set(void);
+void Wireless_Reverse_Set(void);
+
+void Wireless_AGC_Control(void);
+void AGC_Forward_Det_Control(void);
+void AGC_Forward_Out_Control(void);
+void AGC_Reverse_Out_Control(void);
+void AGC_Reverse_Det_Control(void);
+
+
 
 #endif
