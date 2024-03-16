@@ -3,6 +3,21 @@
 
 
 
+void Wireless_Check();	
+void FM_Check();
+
+
+void setDetectLevel_FWD(uint uiLevel, uint uiAmpOutLevel);
+void setDetectLevel_REV(uint uiLevel, uint uiAmpOutLevel);
+void setDetectLevel_FM(uint uiLevel);
+
+void Wireless_REV_Set(void);
+void Wireless_FWD_Set(void);
+void Wireless_Mute(uchar mute);
+void Wireless_Direction_Set(uchar direct);
+
+void Wireless_ModeChange(int iMode);
+
 
 #if 0
 // ATT Define

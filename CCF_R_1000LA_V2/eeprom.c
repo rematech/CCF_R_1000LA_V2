@@ -55,6 +55,9 @@ void Eep_Data_Read(void)
 
 uchar Eep_Read(uint Addr)
 {
+#if 0
+	eeprom_read_block(void * __dst, const void * __src, size_t __n)
+#else
 	while(EECR & (1<<EEWE));
 
 	EEAR = Addr;
@@ -62,6 +65,7 @@ uchar Eep_Read(uint Addr)
 	delay_ms(1);
 
 	return(EEDR);
+#endif
 }
 
 void Eep_Write(uint Adr,uchar Val)

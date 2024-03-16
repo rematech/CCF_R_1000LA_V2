@@ -48,4 +48,74 @@ void Debug_Path_Open(void);
 #endif
 
 
+
+
+
+
+#define USART1_P_STARTCODE			'S'
+#define USART1_P_ENDCODE			'E'
+#define USART1_MAX_BUF				20
+
+typedef struct strUartProtocol
+{
+	union
+	{
+		uchar ucCmdBuf[USART1_MAX_BUF];
+		struct
+		{
+			uchar ucStartCode;
+			uchar ucCommand;
+			uint uiData;
+			uchar ucEndCode;
+		} pa;
+	};
+	
+	uchar ucRecieveCount;
+
+	
+} STR_UART_PROTOCOL;
+extern STR_UART_PROTOCOL g_uart;
+
+////////////////////////////////////////////////////
+#define __U1CMD__HELP_					'H'
+#define __U1CMD__SET_FWD_				'A'
+#define __U1CMD__SET_REV_				'B'
+#define __U1CMD__SET_FM_				'F'
+
+// Undetect threshold offset
+#define __U1CMD__SET_FWD_UTO_			'U'
+#define __U1CMD__SET_REV_UTO_			'D'
+
+#define __U1CMD__SET_DIRECTION_SW		'X'
+#define __U1CMD__MAX_UNLOCK_COUNT		'C'
+#define __U1CMD__MAX_LOCK_COUNT			'L'
+
+#define __U1CMD__PRINT_EN				'P'
+#define __U1CMD__PRINT_DIS				'S'
+#define __U1CMD__DEBUG_RESET			'Q'
+#define __U1CMD__F_INIT					'I'
+#define __U1CMD__PRINT_EEPROM			'R'
+////////////////////////////////////////////////////
+
+typedef enum 
+{
+	USART1__STARTCODE,
+	USART1__CMD,
+	USART1__NUM_1,
+	USART1__NUM_2,
+	USART1__NUM_3,
+	USART1__NUM_4,
+	USART1__ENDCODE,
+
+	USART1__COUNT
+} USART1_PROTOCOL;
+	
+
+void USART1_InitialData();
+
+ 
+void CommandProcess();
+void PrintParameter();
+
+
 #endif

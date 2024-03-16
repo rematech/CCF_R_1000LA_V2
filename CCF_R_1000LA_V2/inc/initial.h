@@ -11,20 +11,6 @@
 #define CLEAR_BIT(port, bit) 			(port &= ~(1 << bit))
 
 
-typedef enum
-{
-	SWMODE_RF2,
-	SWMODE_RF1,
-} SWITCH_MODE;
-	
-void setSwitch_FWD1(BOOL bRF1);
-void setSwitch_FWD2(BOOL bRF1);
-void setSwitch_REV1(BOOL bRF1);
-void setSwitch_REV2(BOOL bRF1);
-
-void setLED_FWD(BOOL bLEDOn);
-void setLED_REV(BOOL bLEDOn);
-void setLED_FM(BOOL bLEDOn);
 
 
 

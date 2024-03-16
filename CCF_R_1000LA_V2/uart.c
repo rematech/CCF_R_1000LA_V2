@@ -136,6 +136,17 @@ static void put_one_char(char c, void *dummy)
 char g_ucPrintBuf[256];
 int printf(const char *format, ...)                    /* Our main entry */
 {
+#if 1
+	va_list args;
+
+	va_start(args,format);
+	vsprintf(g_ucPrintBuf,format,args);
+	va_end(args);
+
+	Putstr1((unsigned char*)g_ucPrintBuf);
+
+	return 0;
+#else
 	va_list args;
 	int i;
 	int count;
@@ -147,8 +158,9 @@ int printf(const char *format, ...)                    /* Our main entry */
 	count = sizeof(g_ucPrintBuf);
 
 	for( i=0; i<count; i++)
-	Putchar1(g_ucPrintBuf[i]);
+		Putchar1(g_ucPrintBuf[i]);
 
 	return count;
+#endif
 }
 

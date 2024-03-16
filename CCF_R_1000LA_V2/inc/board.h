@@ -13,6 +13,9 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+#define F_CPU			16000000
+#include <util/delay.h>
+
 
 #include "defines.h"
 #include "timer.h"
@@ -20,7 +23,7 @@
 #include "adc.h"
 #include "Castcore_Debug.h"
 
-#include "common.h"
+//#include "common.h"
 #include "eeprom.h"
 #include "uart.h"
 #include "wireless.h"
@@ -43,6 +46,36 @@ extern System_Param			Sys;
 extern FM_Param				FM;
 #endif
 
+//adc port
+#define _ADCPORT_FWD2_AMP	3
+#define _ADCPORT_REV2_AMP	4
+#define _ADCPORT_FM_		5
+#define _ADCPORT_REV_		6
+#define _ADCPORT_FWD_		7
+
+
+
+typedef enum
+{
+	SWMODE_RF2,
+	SWMODE_RF1,
+} SWITCH_MODE;
+
+typedef enum
+{
+	LED_OFF,
+	LED_ON,
+} LED_;
+
+	
+void setSwitch_FWD1(BOOL bRF1);
+void setSwitch_FWD2(BOOL bRF1);
+void setSwitch_REV1(BOOL bRF1);
+void setSwitch_REV2(BOOL bRF1);
+
+void setLED_FWD(BOOL bLEDOn);
+void setLED_REV(BOOL bLEDOn);
+void setLED_FM(BOOL bLEDOn);
 
 
 

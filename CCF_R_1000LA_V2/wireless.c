@@ -2,148 +2,196 @@
 
 
 
-
 ////Switch Direction
-
-
-
-
-
-#if 0
-
-// Att Value : 0 ~ 63(63=최대 감소)
-void RF_Level_Set(uchar att_sel, uchar rf_db)
+void setDetectLevel_FWD(uint uiLevel, uint uiAmpOutLevel)
 {
-	uchar i, temp;
-
-	ATT_SCK_LOW;
-
-	switch(att_sel)
-	{
-		case FWD_ATT_DET :
-			FWD_ATT_DET_LE_LOW;
-			break;
-		case FWD_ATT_1st :
-			FWD_ATT_1st_LE_LOW;
-			break;
-		case FWD_ATT_2nd :
-			FWD_ATT_2nd_LE_LOW;
-			break;
-		case FWD_ATT_3rd :
-			FWD_ATT_3rd_LE_LOW;
-			break;
-		case REV_ATT_DET :
-			REV_ATT_DET_LE_LOW;
-			break;
-		case REV_ATT_1st :
-			REV_ATT_1st_LE_LOW;
-			break;
-		case REV_ATT_2nd :
-			REV_ATT_2nd_LE_LOW;
-			break;
-		case REV_ATT_3rd :
-			REV_ATT_3rd_LE_LOW;
-			break;
-		default :
-			break;
-	}
-
-	temp = (rf_db * 2);
-
-	for (i=0; i<6; i++)
-	{
-		delay_us(10);
-
-		if ((temp >> (5-i)) & 0x01)		ATT_DOUT_HIGH;
-		else							ATT_DOUT_LOW;
-
-		delay_us(10);
-		ATT_SCK_HIGH;
-
-		delay_us(10);
-		ATT_SCK_LOW;
-	}
-
-	delay_us(10);
-	switch(att_sel)
-	{
-		case FWD_ATT_DET :
-			FWD_ATT_DET_LE_HIGH;
-			break;
-		case FWD_ATT_1st :
-			FWD_ATT_1st_LE_HIGH;
-			break;
-		case FWD_ATT_2nd :
-			FWD_ATT_2nd_LE_HIGH;
-			break;
-		case FWD_ATT_3rd :
-			FWD_ATT_3rd_LE_HIGH;
-			break;
-		case REV_ATT_DET :
-			REV_ATT_DET_LE_HIGH;
-			break;
-		case REV_ATT_1st :
-			REV_ATT_1st_LE_HIGH;
-			break;
-		case REV_ATT_2nd :
-			REV_ATT_2nd_LE_HIGH;
-			break;
-		case REV_ATT_3rd :
-			REV_ATT_3rd_LE_HIGH;
-			break;
-		default :
-			break;
-	}
-
-	delay_us(10);
-	switch(att_sel)
-	{
-		case FWD_ATT_DET :
-			FWD_ATT_DET_LE_LOW;
-			break;
-		case FWD_ATT_1st :
-			FWD_ATT_1st_LE_LOW;
-			break;
-		case FWD_ATT_2nd :
-			FWD_ATT_2nd_LE_LOW;
-			break;
-		case FWD_ATT_3rd :
-			FWD_ATT_3rd_LE_LOW;
-			break;
-		case REV_ATT_DET :
-			REV_ATT_DET_LE_LOW;
-			break;
-		case REV_ATT_1st :
-			REV_ATT_1st_LE_LOW;
-			break;
-		case REV_ATT_2nd :
-			REV_ATT_2nd_LE_LOW;
-			break;
-		case REV_ATT_3rd :
-			REV_ATT_3rd_LE_LOW;
-			break;
-		default :
-			break;
-	}
-
-	ATT_SCK_LOW;
-
-	delay_us(10);
+	g_Data.eep.detectLevel.FWD = uiLevel;
+	g_Data.eep.detectLevel.FWD2_AMP = uiAmpOutLevel;
 }
 
-void RF_Level_Init(void)
+void setDetectLevel_REV(uint uiLevel, uint uiAmpOutLevel)
 {
-	FWD_ATT_DET_LE_LOW;
-	FWD_ATT_1st_LE_LOW;
-	FWD_ATT_2nd_LE_LOW;
-	FWD_ATT_3rd_LE_LOW;
+	g_Data.eep.detectLevel.REV = uiLevel;
+	g_Data.eep.detectLevel.REV2_AMP = uiAmpOutLevel;
+}
 
-	REV_ATT_DET_LE_LOW;
-	REV_ATT_1st_LE_LOW;
-	REV_ATT_2nd_LE_LOW;
-	REV_ATT_3rd_LE_LOW;
+void setDetectLevel_FM(uint uiLevel)
+{
+	g_Data.eep.detectLevel.FM = uiLevel;
+	//g_Data.eep.detectLevel.FM_Range = uiRange;
+}
 
-	ATT_SCK_LOW;
+
+#define FWD__IS_DETECTED()					g_Data.detect_status.FWD
+#define FWD__SET_STATUS(x)					(g_Data.detect_status.FWD = x)
+#define FWD__CHECK_SIGNAL()					(g_Data.readADC.FWD >= g_Data.eep.detectLevel.FWD)
+#define FWD__CHECK_SIGNAL2()				( (g_Data.readADC.FWD >= (g_Data.eep.detectLevel.FWD - g_Data.eep.uto.FWD)) ||  (g_Data.readADC.FWD2_AMP >= WIRELESS_FWD2_AMP_OUT_LEVEL ))
+#define FWD__UNDETECTED_SIGNAL()			( g_Data.undetectCount.FWD >= g_Data.eep.uiUnlock_count )
+#define FWD__DETECT_SIGNAL()				( g_Data.detectCount.FWD >= g_Data.eep.uiLock_count )
+
+
+#define REV__IS_DETECTED()					g_Data.detect_status.REV
+#define REV__SET_STATUS(x)					(g_Data.detect_status.REV = x)
+#define REV__CHECK_SIGNAL()					(g_Data.readADC.REV >= g_Data.eep.detectLevel.REV)
+#define REV__CHECK_SIGNAL2()				( (g_Data.readADC.REV >= (g_Data.eep.detectLevel.REV - g_Data.eep.uto.REV)) ||  (g_Data.readADC.REV2_AMP >= WIRELESS_REV2_AMP_OUT_LEVEL ))
+#define REV__UNDETECTED_SIGNAL()			( g_Data.undetectCount.REV >= g_Data.eep.uiUnlock_count )
+#define REV__DETECT_SIGNAL()				( g_Data.detectCount.REV >= g_Data.eep.uiLock_count )
+
+
+void Wireless_Check()
+{
+	switch(g_Data.ucCurrentCheckMode)
+	{
+		case CM_FWD:
+		default:
+			if(FWD__IS_DETECTED())
+			{
+				if(FWD__CHECK_SIGNAL2())
+				{
+					g_Data.undetectCount.FWD = 0;
+				}
+				else
+				{
+					g_Data.undetectCount.FWD++;
+				}
+
+				if(FWD__UNDETECTED_SIGNAL())
+				{
+					FWD__SET_STATUS(0);
+				}
+				
+			}
+			else
+			{
+				if(!REV__IS_DETECTED())
+				{
+					if(FWD__CHECK_SIGNAL())
+						g_Data.detectCount.FWD++;
+					else
+						g_Data.detectCount.FWD = 0;
+
+					if(FWD__DETECT_SIGNAL())
+					{
+						FWD__SET_STATUS(1);
+						Wireless_ModeChange(CM_FWD);
+					}
+				}
+				
+			}
+
+
+			g_Data.ucCurrentCheckMode = CM_REV;
+
+			
+			break;
+		case CM_REV:
+			if(REV__IS_DETECTED())
+			{
+				if(REV__CHECK_SIGNAL2())
+				{
+					g_Data.undetectCount.REV = 0;
+				}
+				else
+				{
+					g_Data.undetectCount.REV++;
+				}
+
+				if(REV__UNDETECTED_SIGNAL())
+				{
+					REV__SET_STATUS(0);
+				}
+				
+			}
+			else
+			{
+				if(!FWD__IS_DETECTED())
+				{
+					if(REV__CHECK_SIGNAL())
+						g_Data.detectCount.REV++;
+					else
+						g_Data.detectCount.REV = 0;
+
+					if(REV__DETECT_SIGNAL())
+					{
+						REV__SET_STATUS(1);
+						Wireless_ModeChange(CM_REV);
+					}
+				}
+				
+			}
+
+
+			g_Data.ucCurrentCheckMode = CM_FWD;
+
+
+			break;
+	}
+
+	//printf("F: %d, R: %d \r\n", FWD__IS_DETECTED(), REV__IS_DETECTED());
+}
+
+
+void Wireless_ModeChange(int iMode)
+{
+	if(iMode == CM_REV)
+		Wireless_REV_Set();
+	else
+		Wireless_FWD_Set();
+}
+
+
+void Wireless_REV_Set(void)
+{
+	if(g_Data.detect_status.REV)
+	{
+		g_Data.ucCurrentCheckMode = CM_REV;
+		Wireless_Direction_Set(CM_REV);
+	}
+	else
+	{
+		Wireless_Mute(1);
+	}
+}
+
+void Wireless_FWD_Set(void)
+{
+	if(g_Data.detect_status.FWD)
+	{
+		g_Data.ucCurrentCheckMode = CM_FWD;
+		Wireless_Direction_Set(CM_FWD);
+	}
+	else
+	{
+		Wireless_Mute(1);
+	}
+}
+
+void Wireless_Direction_Set(uchar direct)
+{
+	if (direct == CM_FWD)
+	{
+		DEBUGF(MCU_DEBUG, ("Wireless>> Direction Select : Forward ...\r\n"));
+		setSwitch_REV1(0);
+		setSwitch_REV2(0);
+
+		setSwitch_FWD1(1);
+		setSwitch_FWD2(1);
+
+		setLED_FWD(1);
+		setLED_REV(0);
+	}
+	else
+	{
+		DEBUGF(MCU_DEBUG, ("Wireless>> Direction Select : Reverse ...\r\n"));
+		setSwitch_REV1(1);
+		setSwitch_REV2(1);
+
+		setSwitch_FWD1(0);
+		setSwitch_FWD2(0);
+
+		setLED_FWD(0);
+		setLED_REV(1);
+	}
 }
 
 void Wireless_Mute(uchar mute)
@@ -152,456 +200,27 @@ void Wireless_Mute(uchar mute)
 	{
 		DEBUGF(MCU_DEBUG, ("Wireless>> Mute On...\r\n"));
 
-		WL_OUT_MUTE0_LOW;
-		WL_OUT_MUTE1_LOW;
-		WL_OUT_MUTE2_LOW;
-		WL_OUT_MUTE3_LOW;
+		setSwitch_REV1(0);
+		setSwitch_FWD1(0);
+		setSwitch_REV2(1);
+		setSwitch_FWD2(1);
 
-		REV_DIRECTION_SW1_LOW;
-		FWD_DIRECTION_SW1_LOW;
-		REV_DIRECTION_SW2_HIGH;
-		FWD_DIRECTION_SW2_HIGH;
-
-		FWD_LED_OFF;
-		REV_LED_OFF;
+		setLED_FWD(0);
+		setLED_REV(0);
 	}
 	else
 	{
 		DEBUGF(MCU_DEBUG, ("Wireless>> Mute Off...\r\n"));
 
-		WL_OUT_MUTE0_HIGH;
-		WL_OUT_MUTE1_HIGH;
-		WL_OUT_MUTE2_HIGH;
-		WL_OUT_MUTE3_HIGH;
 	}
 }
 
-void Wireless_Direction_Set(uchar direct)
-{
-	if (direct == FORWARD_SEL)
-	{
-		DEBUGF(MCU_DEBUG, ("Wireless>> Direction Select : Forward ...\r\n"));
-		REV_DIRECTION_SW1_LOW;
-		FWD_DIRECTION_SW1_HIGH;
-		REV_DIRECTION_SW2_LOW;
-		FWD_DIRECTION_SW2_HIGH;
 
-		FWD_LED_ON;
-		REV_LED_OFF;
-	}
+void FM_Check()
+{
+	if( g_Data.readADC.FM >= g_Data.eep.detectLevel.FM )
+		setLED_FM(1);
 	else
-	{
-		DEBUGF(MCU_DEBUG, ("Wireless>> Direction Select : Reverse ...\r\n"));
-		REV_DIRECTION_SW1_HIGH;
-		FWD_DIRECTION_SW1_LOW;
-		REV_DIRECTION_SW2_HIGH;
-		FWD_DIRECTION_SW2_LOW;
-
-		FWD_LED_OFF;
-		REV_LED_ON;
-	}
+		setLED_FM(0);
 }
-
-
-void Wireless_Boot_Level_Set(void)
-{
-	RF_Level_Set(FWD_ATT_DET, Fwd.Att_Det_dB);
-	RF_Level_Set(FWD_ATT_3rd, Fwd.Att_3rd_dB);
-	RF_Level_Set(FWD_ATT_2nd, Fwd.Att_2nd_dB);
-	RF_Level_Set(FWD_ATT_1st, Fwd.Att_1st_dB);
-
-	RF_Level_Set(REV_ATT_DET, Rev.Att_Det_dB);
-	RF_Level_Set(REV_ATT_3rd, Rev.Att_3rd_dB);
-	RF_Level_Set(REV_ATT_2nd, Rev.Att_2nd_dB);
-	RF_Level_Set(REV_ATT_1st, Rev.Att_1st_dB);
-}
-
-void Wireless_Detect_Ground(uchar direct)
-{
-	if (direct == FORWARD_SEL)
-	{
-		// Port B, Bit6 Output
-		//PORTB = 0x3F;
-		DDRB  = 0x5B;
-		REV_SET_GND;
-
-		delay_ms(DET_GND_DELAY);
-
-		// Port B, Bit6 Input
-		PORTB = 0x3F;
-		DDRB  = 0x1B;
-	}
-	else
-	{
-		// Port B, Bit7 Output
-		//PORTB = 0x3F;
-		DDRB  = 0x9B;
-		FWD_SET_GND;
-
-		delay_ms(DET_GND_DELAY);
-
-		// Port B, Bit7 Input
-		PORTB = 0x3F;
-		DDRB  = 0x1B;
-	}
-}
-
-
-
-
-
-///////////////////////////////////
-void Wireless_Check(void)
-{
-	bool detect;
-
-	if (Sys.WL_Check_Sel == REVERSE_SEL)
-	{
-		if (Rev.Detect)
-		{
-			if (Rev.Adc_Value >= (Rev.Det_Level-WIRELESS_DET_RANGE_VOL))	
-				detect = true;
-			else
-				detect = false;
-		}
-		else
-		{
-			if (Rev.Adc_Value >= Rev.Det_Level)
-				detect = true;
-			else
-				detect = false;
-		}
-
-		if ((Rev.Detect != detect) && (Fwd.Detect == false))
-		{
-			if (!Rev.Detect)
-			{
-				Rev.Detect = detect;
-				Wireless_Reverse_Set();
-				Rev.Unlock_Cnt = 0;
-			}
-			else
-			{
-				if (!detect)
-				{
-					if (Rev.Unlock_Cnt < Sys.Max_Unlock_Cnt)
-					{
-						Rev.Unlock_Cnt++;
-					}
-					else
-					{
-						Rev.Detect = detect;
-						Wireless_Reverse_Set();
-						Rev.Unlock_Cnt = 0;
-					}
-				}
-				else
-				{
-					Rev.Unlock_Cnt = 0;
-				}
-			}
-		}
-
-		Sys.WL_Check_Sel = FORWARD_SEL;
-	}
-	else
-	{
-		if (Fwd.Detect)
-		{
-			if (Fwd.Adc_Value >= (Fwd.Det_Level-WIRELESS_DET_RANGE_VOL))	detect = true;
-			else															detect = false;
-		}
-		else
-		{
-			if (Fwd.Adc_Value >= Fwd.Det_Level)								detect = true;
-			else															detect = false;
-		}
-
-		if ((Fwd.Detect != detect) && (Rev.Detect == false))
-		{
-			if (!Fwd.Detect)
-			{
-				Fwd.Detect = detect;
-				Wireless_Forward_Set();
-				Fwd.Unlock_Cnt = 0;
-			}
-			else
-			{
-				if (!detect)
-				{
-					if (Fwd.Unlock_Cnt < Sys.Max_Unlock_Cnt)
-					{
-						Fwd.Unlock_Cnt++;
-					}
-					else
-					{
-						Fwd.Detect = detect;
-						Wireless_Forward_Set();
-						Fwd.Unlock_Cnt = 0;
-					}
-				}
-				else
-				{
-					Fwd.Unlock_Cnt = 0;
-				}
-			}
-		}
-
-		Sys.WL_Check_Sel = REVERSE_SEL;
-	}
-}
-
-void Wireless_Forward_Set(void)
-{
-	Wireless_Detect_Ground(FORWARD_SEL);
-
-	if (Fwd.Detect)
-	{
-		DEBUGF(MCU_DEBUG, ("Wireless>> Forward Signal Detect...\r\n"));
-
-		Fwd.Detect = true;
-		Fwd.Agc_En = true;
-
-		Sys.Direction = FORWARD_SEL;
-		Wireless_Direction_Set(Sys.Direction);
-
-		RF_Level_Set(REV_ATT_DET, DET_DEFAULT_ATT_LEVEL);
-		Wireless_Mute(WL_MUTE_OFF);
-	}
-	else
-	{
-		Wireless_Mute(WL_MUTE_ON);
-		DEBUGF(MCU_DEBUG, ("Wireless>> Forward Signal Loss...\r\n"));
-
-		Fwd.Detect = false;
-		Fwd.Agc_En = false;
-		Fwd.Att_Det_dB = BOOT_DET_DEFAULT_LEVEL;
-		Fwd.Att_1st_dB = BOOT_AGC_DEFAULT_LEVEL;
-		Fwd.Att_2nd_dB = BOOT_AGC_DEFAULT_LEVEL;
-		Fwd.Att_3rd_dB = BOOT_AGC_DEFAULT_LEVEL;
-
-		Rev.Att_Det_dB = BOOT_DET_DEFAULT_LEVEL;
-
-		RF_Level_Set(FWD_ATT_DET, Fwd.Att_Det_dB);
-		RF_Level_Set(FWD_ATT_1st, Fwd.Att_1st_dB);
-		RF_Level_Set(FWD_ATT_2nd, Fwd.Att_2nd_dB);
-		RF_Level_Set(FWD_ATT_3rd, Fwd.Att_3rd_dB);
-
-		RF_Level_Set(REV_ATT_DET, Rev.Att_Det_dB);
-	}
-}
-
-void Wireless_Reverse_Set(void)
-{
-	Wireless_Detect_Ground(REVERSE_SEL);
-
-	if (Rev.Detect)
-	{
-		DEBUGF(MCU_DEBUG, ("Wireless>> Reverse Signal Detect...\r\n"));
-
-		Rev.Detect = true;
-		Rev.Agc_En = true;
-
-		Sys.Direction = REVERSE_SEL;
-		Wireless_Direction_Set(Sys.Direction);
-
-		RF_Level_Set(FWD_ATT_DET, DET_DEFAULT_ATT_LEVEL);
-		Wireless_Mute(WL_MUTE_OFF);
-	}
-	else
-	{
-		Wireless_Mute(WL_MUTE_ON);
-		DEBUGF(MCU_DEBUG, ("Wireless>> Reverse Signal Loss...\r\n"));
-
-		Rev.Detect = false;
-		Rev.Agc_En = false;
-		Rev.Att_Det_dB = BOOT_DET_DEFAULT_LEVEL;
-		Rev.Att_1st_dB = BOOT_AGC_DEFAULT_LEVEL;
-		Rev.Att_2nd_dB = BOOT_AGC_DEFAULT_LEVEL;
-		Rev.Att_3rd_dB = BOOT_AGC_DEFAULT_LEVEL;
-
-		Fwd.Att_Det_dB = BOOT_DET_DEFAULT_LEVEL;
-
-		RF_Level_Set(REV_ATT_DET, Rev.Att_Det_dB);
-		RF_Level_Set(REV_ATT_1st, Rev.Att_1st_dB);
-		RF_Level_Set(REV_ATT_2nd, Rev.Att_2nd_dB);
-		RF_Level_Set(REV_ATT_3rd, Rev.Att_3rd_dB);
-
-		RF_Level_Set(FWD_ATT_DET, Fwd.Att_Det_dB);
-	}
-}
-
-void Wireless_AGC_Control(void)
-{
-	if (Sys.Direction == FORWARD_SEL)
-	{
-		if (Fwd.Agc_En)
-		{
-			if (RX_AGC_EN)	AGC_Forward_Det_Control();
-			AGC_Forward_Out_Control();
-		}
-	}
-	else
-	{
-		if (Rev.Agc_En)
-		{
-			if (RX_AGC_EN)	AGC_Reverse_Det_Control();
-			AGC_Reverse_Out_Control();
-		}
-	}
-}
-
-void AGC_Forward_Det_Control(void)
-{
-	if (Fwd.Adc_Value > Fwd.Agc_Det_Level)
-	{
-		if (Fwd.Att_Det_dB < MAX_ATT)
-		{
-			Fwd.Att_Det_dB += ATT_STEP;
-			RF_Level_Set(FWD_ATT_DET, Fwd.Att_Det_dB);
-		}
-	}
-}
-
-void AGC_Forward_Out_Control(void)
-{
-	if (Rev.Adc_Value > Fwd.Agc_Out_Level)
-	{
-		if (Fwd.Att_3rd_dB < LIMIT_1st_ATT)
-		{
-			Fwd.Att_3rd_dB += ATT_STEP;
-			RF_Level_Set(FWD_ATT_3rd, Fwd.Att_3rd_dB);
-		}
-		else if (Fwd.Att_2nd_dB < LIMIT_1st_ATT)
-		{
-			Fwd.Att_2nd_dB += ATT_STEP;
-			RF_Level_Set(FWD_ATT_2nd, Fwd.Att_2nd_dB);
-		}
-		else if (Fwd.Att_1st_dB < LIMIT_1st_ATT)
-		{
-			Fwd.Att_1st_dB += ATT_STEP;
-			RF_Level_Set(FWD_ATT_1st, Fwd.Att_1st_dB);
-		}
-		else
-		{
-			if ((Fwd.Att_3rd_dB <= Fwd.Att_2nd_dB) && (Fwd.Att_3rd_dB <= Fwd.Att_1st_dB))
-			{
-				if (Fwd.Att_3rd_dB < MAX_ATT)
-				{
-					Fwd.Att_3rd_dB += ATT_STEP;
-					RF_Level_Set(FWD_ATT_3rd, Fwd.Att_3rd_dB);
-				}
-			}
-			else if (Fwd.Att_3rd_dB > Fwd.Att_2nd_dB)
-			{
-				if (Fwd.Att_2nd_dB < MAX_ATT)
-				{
-					Fwd.Att_2nd_dB += ATT_STEP;
-					RF_Level_Set(FWD_ATT_2nd, Fwd.Att_2nd_dB);
-				}
-			}
-			else if (Fwd.Att_3rd_dB > Fwd.Att_1st_dB)
-			{
-				if (Fwd.Att_1st_dB < MAX_ATT)
-				{
-					Fwd.Att_1st_dB += ATT_STEP;
-					RF_Level_Set(FWD_ATT_1st, Fwd.Att_1st_dB);
-				}
-			}
-		}
-	}
-	else if (Rev.Adc_Value < (Fwd.Agc_Out_Level-WIRELESS_AGC_RANGE_VOL))
-	{
-		Fwd.Att_1st_dB = BOOT_AGC_DEFAULT_LEVEL;
-		Fwd.Att_2nd_dB = BOOT_AGC_DEFAULT_LEVEL;
-		Fwd.Att_3rd_dB = BOOT_AGC_DEFAULT_LEVEL;
-		RF_Level_Set(FWD_ATT_1st, Fwd.Att_1st_dB);
-		RF_Level_Set(FWD_ATT_2nd, Fwd.Att_2nd_dB);
-		RF_Level_Set(FWD_ATT_3rd, Fwd.Att_3rd_dB);
-	}
-}
-
-void AGC_Reverse_Det_Control(void)
-{
-	if (Rev.Adc_Value > Rev.Agc_Det_Level)
-	{
-		if (Rev.Att_Det_dB < MAX_ATT)
-		{
-			Rev.Att_Det_dB += ATT_STEP;
-			RF_Level_Set(REV_ATT_DET, Rev.Att_Det_dB);
-		}
-	}
-}
-
-void AGC_Reverse_Out_Control(void)
-{
-	if (Fwd.Adc_Value > Rev.Agc_Out_Level)
-	{
-		if (Rev.Att_3rd_dB < LIMIT_1st_ATT)
-		{
-			Rev.Att_3rd_dB += ATT_STEP;
-			RF_Level_Set(REV_ATT_3rd, Rev.Att_3rd_dB);
-		}
-		else if (Rev.Att_2nd_dB < LIMIT_1st_ATT)
-		{
-			Rev.Att_2nd_dB += ATT_STEP;
-			RF_Level_Set(REV_ATT_2nd, Rev.Att_2nd_dB);
-		}
-		else if (Rev.Att_1st_dB < LIMIT_1st_ATT)
-		{
-			Rev.Att_1st_dB += ATT_STEP;
-			RF_Level_Set(REV_ATT_1st, Rev.Att_1st_dB);
-		}
-		else
-		{
-			if ((Rev.Att_3rd_dB <= Rev.Att_2nd_dB) && (Rev.Att_3rd_dB <= Rev.Att_1st_dB))
-			{
-				if (Rev.Att_3rd_dB < MAX_ATT)
-				{
-					Rev.Att_3rd_dB += ATT_STEP;
-					RF_Level_Set(REV_ATT_3rd, Rev.Att_3rd_dB);
-				}
-			}
-			else if (Rev.Att_3rd_dB > Rev.Att_2nd_dB)
-			{
-				if (Rev.Att_2nd_dB < MAX_ATT)
-				{
-					Rev.Att_2nd_dB += ATT_STEP;
-					RF_Level_Set(REV_ATT_2nd, Rev.Att_2nd_dB);
-				}
-			}
-			else if (Rev.Att_3rd_dB > Rev.Att_1st_dB)
-			{
-				if (Rev.Att_1st_dB < MAX_ATT)
-				{
-					Rev.Att_1st_dB += ATT_STEP;
-					RF_Level_Set(REV_ATT_1st, Rev.Att_1st_dB);
-				}
-			}
-		}
-	}
-	else if (Fwd.Adc_Value < (Rev.Agc_Out_Level-WIRELESS_AGC_RANGE_VOL))
-	{
-		Rev.Att_1st_dB = BOOT_AGC_DEFAULT_LEVEL;
-		Rev.Att_2nd_dB = BOOT_AGC_DEFAULT_LEVEL;
-		Rev.Att_3rd_dB = BOOT_AGC_DEFAULT_LEVEL;
-		RF_Level_Set(REV_ATT_1st, Rev.Att_1st_dB);
-		RF_Level_Set(REV_ATT_2nd, Rev.Att_2nd_dB);
-		RF_Level_Set(REV_ATT_3rd, Rev.Att_3rd_dB);
-	}
-}
-
-void FM_AGC_Control(void)
-{
-	if ( (FM.Adc_Value < (FM.Agc_Level-FM_AGC_RANGE_VOL))
-		|| (FM.Adc_Value > (FM.Agc_Level+FM_AGC_RANGE_VOL)) )
-	{
-		FM_LED_OFF;
-	}
-	else
-	{
-		FM_LED_ON;
-	}
-}
-#endif
 

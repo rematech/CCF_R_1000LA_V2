@@ -23,50 +23,69 @@ SysTime_Param	Systime;
 
 
 
+void timer10msLoop();
+void timer100msLoop();
+void timer1000msLoop();
 int main(void)
 {
 	Init_MCU();
-	//Init_System();
+	Init_System();
 
     while (1) 
     {
-
-
-
-#if 0
-		if (Sys.Debug_Flag)	
-			Command_Check();
-
+		timer10msLoop();
+		timer100msLoop();
+		timer1000msLoop();
 		
-		///////////////////////////////////////////
-		if(Systime.Flag_10ms)
-		{
-			AGC_All_Read();
-
-			if ((!Fwd.Debug_Det_Lvl_En) && (!Rev.Debug_Det_Lvl_En)
-					&& (!Fwd.Debug_Agc_Out_En) && (!Rev.Debug_Agc_Out_En))
-			{
-				Wireless_Check();
-				Wireless_AGC_Control();
-			}
-
-			if ((FM_RUN_EN) && (!FM.Debug_Att_En))	
-				FM_AGC_Control();
-
-
-			Systime.Flag_10ms = 0;
-		}
-
-		///////////////////////////////////////////
-		if(Systime.Flag_1000ms)
-		{
-			if (Sys.Debug_Dsp_En)
-				Agc_Display();
-
-			Systime.Flag_1000ms = 0;
-		}
-
-#endif
+		//delay_ms(500);
+		//printf("1sec: %d\r\n", Systime.Count_10ms);
     }
 }
+
+void timer10msLoop()
+{
+	if(Systime.Flag_10ms)
+	{
+		ADC_All_Read();
+
+		Wireless_Check();
+		FM_Check();
+
+
+
+		Systime.Flag_10ms = 0;
+	}
+}
+
+void timer100msLoop()
+{
+	if(Systime.Flag_100ms)
+	{
+		//
+		//setLED_FWD(0);
+
+		Systime.Flag_100ms = 0;
+	}
+
+}
+
+//uchar ucTemp = 0;
+void timer1000msLoop()
+{	
+	if(Systime.Flag_1000ms)
+	{
+		//ucTemp++;
+		
+		//setLED_FWD(ucTemp%2);
+		//setLED_REV(ucTemp%2);
+		//setLED_FM(ucTemp%2);
+		CommandProcess();
+		PrintParameter();
+
+		
+
+		Systime.Flag_1000ms = 0;
+	}
+}
+
 

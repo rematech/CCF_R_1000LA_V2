@@ -1,18 +1,42 @@
 #include "board.h"
 
+
+STR_UART_PROTOCOL g_uart;
+
 void USART1_RXC_interrupt(void);
-ISR(USART0_RX_vect)
+ISR(USART1_RX_vect)
 {
 	USART1_RXC_interrupt();
+	//Putchar1('c');
+
+	//sei();
 }
 
 //--------------------[ Uart Function ]-------------------------------------
 //#pragma vector = USART1_RXC_vect
+
+
+
+
+uchar g_ucCommand;
+uint g_iCmdData = 0;
+bool g_bRCommand = false;
+
+void USART1_InitialData()
+{
+	g_uart.ucRecieveCount = 0;
+}
+
+#define HEX_TO_NUM(X)			(X>'a'?X-'a':(X>'A'?X-'A':X-'0'))
 void USART1_RXC_interrupt(void)
 {
+	cli();
+	g_uart.ucCmdBuf[g_uart.ucRecieveCount] = UDR1;
 
+	if(g_uart.ucRecieveCount < USART1_MAX_BUF)
+		g_uart.ucRecieveCount++;
 
-
+	sei();
 #if 0
 	uchar temp;
 //	CLI;
@@ -40,6 +64,149 @@ void USART1_RXC_interrupt(void)
 
 //	SEI;
 #endif
+}
+
+void USART1_Parse()
+{
+	if( g_uart.ucRecieveCount >= USART1__COUNT)
+	{
+		BOOL bProtocol_validcheck = true;
+		if(g_uart.ucCmdBuf[USART1__STARTCODE] != USART1_P_STARTCODE)
+			bProtocol_validcheck = false;
+
+		if(g_uart.ucCmdBuf[USART1__ENDCODE] != USART1_P_ENDCODE)
+			bProtocol_validcheck = false;
+
+
+		if(bProtocol_validcheck)
+		{
+			g_ucCommand = g_uart.ucCmdBuf[USART1__CMD];
+			g_iCmdData = (HEX_TO_NUM(g_uart.ucCmdBuf[USART1__NUM_1]) << 12) +
+							(HEX_TO_NUM(g_uart.ucCmdBuf[USART1__NUM_2]) << 8) +
+							(HEX_TO_NUM(g_uart.ucCmdBuf[USART1__NUM_3]) << 4) +
+							(HEX_TO_NUM(g_uart.ucCmdBuf[USART1__NUM_4]));
+
+			g_bRCommand = 1;
+		}
+
+		g_uart.ucRecieveCount = 0;
+
+
+		//printf("U:%d %d %d", g_uart.ucRecieveCount, g_uart.ucCmdBuf[USART1__CMD], bProtocol_validcheck);
+
+	}
+
+}
+
+
+int toupper(int ch) {
+    if (ch >= 'a' && ch <= 'z')		// 소문자인 경우 대문자로 변환
+	{	
+        return ch - 'a' + 'A';
+    } else {
+        // 소문자가 아닌 경우 그대로 반환
+        return ch;
+    }
+}
+
+void CommandProcess()
+{
+	uchar ucCmd;
+
+	USART1_Parse();
+	if( !g_bRCommand )
+		return;
+	else
+		g_bRCommand = 0;
+
+	ucCmd = toupper(g_ucCommand);
+
+	//printf("cmd : %d\r\n", ucCmd);
+	//return;
+
+	
+	switch(ucCmd)
+	{
+		case __U1CMD__HELP_:
+			printf("\n\n\r==================== Debug Command ====================\n\r");
+			printf(" Protocol : Start - Cmd N0 N1 N2 N3 End \r\n");
+			printf(" set detect level : FWD(A) REV(B) FM(F)");
+			printf("-----------------------------------------------\n\r");
+			printf(" undetect threshold offset : FWD(U) REV(D) \n\r");
+			printf("-----------------------------------------------\n\r");
+			printf(" max count : Lock(L) unLock(C) \n\r");
+			printf("-----------------------------------------------\n\r");
+			printf(" ADC print  : enable(P) Disable(S) \n\r");
+			printf(" Debug Off  (Q) \r\n");
+			printf(" Factory INit  (I) \r\n");
+			printf(" Print EEPROM  (R) \r\n");
+			printf("=======================================================\n\n\r");
+			break;
+		case __U1CMD__SET_FWD_:
+			g_Data.eep.detectLevel.FWD = g_iCmdData;
+			printf("SetFWD_Lvl : %d\r\n", g_Data.eep.detectLevel.FWD);
+			break;
+		case __U1CMD__SET_REV_:
+			g_Data.eep.detectLevel.REV = g_iCmdData;
+			printf("SetREV_Lvl : %d\r\n", g_Data.eep.detectLevel.REV);
+			break;
+		case __U1CMD__SET_FM_:
+			g_Data.eep.detectLevel.FM = g_iCmdData;
+			printf("SetFm_Lvl : %d\r\n", g_Data.eep.detectLevel.FM);
+			break;
+		case __U1CMD__SET_FWD_UTO_:
+			g_Data.eep.uto.FWD = g_iCmdData;
+			printf("SetFm_Undetect Threshold Lvl : %d\r\n", g_Data.eep.uto.FWD);
+			break;
+		case __U1CMD__SET_REV_UTO_:
+			g_Data.eep.uto.REV = g_iCmdData;
+			printf("SetFm_Undetect Threshold Lvl : %d\r\n", g_Data.eep.uto.REV);
+			break;
+		case __U1CMD__SET_DIRECTION_SW:
+			break;
+		case __U1CMD__MAX_UNLOCK_COUNT:
+			g_Data.eep.uiUnlock_count = g_iCmdData;
+			printf("Unlock Count : %d\r\n", g_Data.eep.uiUnlock_count);
+			break;
+		case __U1CMD__MAX_LOCK_COUNT:
+			g_Data.eep.uiLock_count = g_iCmdData;
+			printf("Lock Count : %d\r\n", g_Data.eep.uiLock_count);
+			break;
+
+		case __U1CMD__PRINT_EN:
+			g_Data.ucPrint = 1;
+			break;
+		case __U1CMD__PRINT_DIS:
+			g_Data.ucPrint = 0;
+			break;
+		case __U1CMD__DEBUG_RESET:
+			g_Data.ucDebug = 0;
+			break;
+		case __U1CMD__F_INIT:
+			break;
+		case __U1CMD__PRINT_EEPROM:
+			printf("< EEPROM > \r\n");
+			printf("FWD Det : %d\r\n", g_Data.eep.detectLevel.FWD);
+			printf("REV Det : %d\r\n", g_Data.eep.detectLevel.REV);
+			printf("FM Det : %d\r\n", g_Data.eep.detectLevel.FM);
+			printf("unDet threshold offset : FWD: %d  REV: %d\r\n", g_Data.eep.uto.FWD, g_Data.eep.uto.REV);
+			break;
+			
+	}
+
+	printf("Cmd_Int : %d", g_iCmdData);
+
+}
+
+void PrintParameter()
+{
+	if(g_Data.ucPrint)
+	{
+		printf("< Detect Level >\r\n");
+		printf("FWD : %d, REV: %d, FM : %d", g_Data.eep.detectLevel.FWD, g_Data.eep.detectLevel.REV, g_Data.eep.detectLevel.FM);
+		printf("Count>> Lock %d, unLock : %d", g_Data.eep.uiLock_count, g_Data.eep.uiUnlock_count);
+		printf("unDetect Threshod Offset>> FWD: %d, REV : %d \r\n", g_Data.eep.uto.FWD, g_Data.eep.uto.REV);
+	}
 }
 
 #if 0

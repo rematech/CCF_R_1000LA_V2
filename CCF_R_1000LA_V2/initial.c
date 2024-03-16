@@ -1,4 +1,5 @@
 #include "board.h"
+#include <avr/eeprom.h>
 
 GlobalData g_Data;
 void Init_MCU(void)
@@ -133,18 +134,25 @@ void Init_MCU(void)
 	// Function Initialized
 	Timer0_Init();
 	Uart1_Init();
-	Adc_Init();
+	ADC_Init();
 
 	//RF_Level_Init();
 
-	SEI;	//re-enable interrupts
+	sei();	//re-enable interrupts
 
 	//all peripherals are now initialized
 }
 
 void Init_System(void)
 {
-#if 0
+#if 1
+	setLED_FWD(0);
+	setLED_REV(0);
+	setLED_FM(0);
+
+	USART1_InitialData();
+
+#else
 	FWD_LED_OFF;
 	REV_LED_OFF;
 	FM_LED_OFF;
@@ -158,8 +166,21 @@ void Init_System(void)
 void Factory_Reset_Data(void)
 {
 #if 1
-	g_Data.uiLock_count = 30;
-	g_Data.uiUnlock_count = 30;
+	g_Data.eep.uiLock_count = 2;
+	g_Data.eep.uiUnlock_count = 5;
+
+	g_Data.eep.uiSWVersion = 0x00;
+	g_Data.eep.uc1stCheck = 0xB7;
+	g_Data.ucCurrentCheckMode = CM_FWD;
+
+	g_Data.detect_status.FWD = 0;
+	g_Data.detect_status.REV = 0;
+
+	setDetectLevel_FWD(WIRELESS_FWD_DET_LEVEL, WIRELESS_FWD2_AMP_OUT_LEVEL);
+	setDetectLevel_REV(WIRELESS_REV_DET_LEVEL, WIRELESS_REV2_AMP_OUT_LEVEL);
+	setDetectLevel_FM(FM_AGC_LEVEL);
+
+	
 #else
 	Sys.Version = Main_SW_VER;
 
@@ -182,61 +203,6 @@ void Factory_Reset_Data(void)
 
 
 ///////////
-void setSwitch_FWD1(BOOL bRF1)
-{
-	if(bRF1)
-		SET_BIT(PORTE, 5);
-	else
-		CLEAR_BIT(PORTE, 5);
-}
-
-void setSwitch_FWD2(BOOL bRF1)
-{
-	if(bRF1)
-		SET_BIT(PORTB, 3);
-	else
-		CLEAR_BIT(PORTB, 3);
-}
-
-void setSwitch_REV1(BOOL bRF1)
-{
-	if(bRF1)
-		SET_BIT(PORTE, 6);
-	else
-		CLEAR_BIT(PORTE, 6);
-}
-
-void setSwitch_REV2(BOOL bRF1)
-{
-	if(bRF1)
-		SET_BIT(PORTB, 4);
-	else
-		CLEAR_BIT(PORTB, 4);
-}
-
-void setLED_FWD(BOOL bLEDOn)
-{
-	if(bLEDOn)
-		SET_BIT(PORTE, 0);
-	else
-		CLEAR_BIT(PORTE, 0);
-}
-
-void setLED_REV(BOOL bLEDOn)
-{
-	if(bLEDOn)
-		SET_BIT(PORTE, 1);
-	else
-		CLEAR_BIT(PORTE, 1);
-}
-
-void setLED_FM(BOOL bLEDOn)
-{
-	if(bLEDOn)
-		SET_BIT(PORTE, 2);
-	else
-		CLEAR_BIT(PORTE, 2);
-}
 
 
 

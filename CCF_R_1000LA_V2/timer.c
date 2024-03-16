@@ -11,31 +11,24 @@
 
 void Timer0_Init(void)
 {
-	CLI;
-
-	// Prescaler 1024
+    // 8-bit Fast PWM 모드 설정
 	TCCR0 = ((1 << CS02) | (1 << CS01) | (1 << CS00));
+    // 클럭 분주비 64 설정
+    TCCR0 |= (1 << CS01) | (1 << CS00);
+    // Timer0 오버플로우 인터럽트 허용
+    TIMSK |= (1 << TOIE0);
+    // 초기 TCNT0 값 설정
+    TCNT0 = TIMER0_CNT;
+    // 전역 인터럽트 허용
+    sei();
+//		CLI;
 
-	// Timer / Counter Register
-	TCNT0 = TIMER0_CNT;
 
-	// Output Compare Register
-	OCR0 = 0x00;
-
-	// Timer Interrupt Mask
-	TIMSK = (1 << TOIE0);
-
-	// Timer Interrupt Flag
-	TIFR = (1 << TOV0);
-
-	Systime.Count_10ms = 0;
-
-	SEI;
 }
 
 void TIMER0_OVF_interrupt(void)
 {
-	CLI;
+	cli();
 
 	TIMSK &= ~(1 << TOIE0);
 
@@ -67,10 +60,11 @@ void TIMER0_OVF_interrupt(void)
 	TIFR |= (1 << TOV0);
 	TIMSK |= (1 << TOIE0);
 
-	SEI;
+	sei();
 }
 
-ISR(TIMER0_COMPA_vect)
+
+ISR(TIMER0_OVF_vect)
 {
 	TIMER0_OVF_interrupt();
 }
@@ -78,6 +72,7 @@ ISR(TIMER0_COMPA_vect)
 
 
 ////////////////////////////////////delay
+#if 0
 void delay_us(uint us)
 {
  	uint i;
@@ -92,13 +87,14 @@ void delay_us(uint us)
 		asm("POP R0");		  // 2 cycle
 	}
 }
+#endif
 
 void delay_ms(uint ms)
 {
  	uint i;
 
 	for(i = 0; i < ms; i++)
-		delay_us(1000);
+		_delay_us(1000);
 }
 
 void delay_sec(uint sec)
@@ -106,7 +102,7 @@ void delay_sec(uint sec)
  	uint i;
 
 	for(i = 0; i < sec; i++)
-		delay_ms(1000);
+		_delay_ms(1000);
 }
 
 

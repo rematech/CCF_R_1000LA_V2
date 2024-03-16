@@ -39,30 +39,116 @@ typedef struct
 } SysTime_Param;
 
 
+
+
+typedef struct
+{
+	struct 
+	{
+		uint FWD;
+		uint REV;
+		uint FM;
+		//uint FM_Range;
+
+		uint FWD2_AMP;
+		uint REV2_AMP;
+	} detectLevel;
+
+	struct
+	{
+		uint FWD;
+		uint REV;
+	} uto;	//undetect threshold reduce offset
+
+	uint uiLock_count;			// 
+	uint uiUnlock_count;		// default : 2
+
+	uint uiSWVersion;
+	uchar uc1stCheck;
+
+	uchar ucChecksum;
+
+
+} EEPROM_MAP;
+
+typedef enum
+{
+	CM_REV,
+	CM_FWD,
+} CHECK_MODE;
+	
 typedef struct 
 {
-	uint uiSWVersion;
+
+	uchar ucCurrentCheckMode;
+
+	struct
+	{
+		uchar FWD;
+		uchar REV;
+	} detect_status;
+	
+	struct
+	{
+		uchar FWD;
+		uchar REV;
+	} undetectCount;
+	
+	struct
+	{
+		uchar FWD;
+		uchar REV;
+	} detectCount;
 	
 	struct
 	{
 		uint FWD;
 		uint REV;
 		uint FM;
+		uint FWD2_AMP;
+		uint REV2_AMP;
+		
 	} readADC;
 
+	uchar ucDebug;
+	uchar ucPrint;
+	////EEPROM MAP START
+	EEPROM_MAP eep;
+
+#if 0 
 	struct 
 	{
 		uint FWD;
 		uint REV;
 		uint FM;
+		uint FM_Range;
+
+		uint FWD2_AMP;
+		uint REV2_AMP;
 	} detectLevel;
+
+	struct
+	{
+		uint FWD;
+		uint REV;
+	} uto;	//undetect threshold reduce offset
+
+	struct
+	{
+		uint FWD;
+		uint REV;
+	} unlockCount;
 
 	uint uiLock_count;
 	uint uiUnlock_count;
+#endif
 
-	
+	////EEPROM MAP END
 } GlobalData;
 extern GlobalData g_Data;
+
+
+
 
 
 
