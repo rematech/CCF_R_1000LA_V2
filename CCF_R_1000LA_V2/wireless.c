@@ -127,6 +127,17 @@ void Wireless_Check()
 			break;
 	}
 
+	if(FWD__IS_DETECTED())
+		setLED_FWD(1);
+	else
+		setLED_FWD(0);
+
+	if(REV__IS_DETECTED())
+		setLED_REV(1);
+	else
+		setLED_REV(0);
+	
+
 	//printf("F: %d, R: %d \r\n", FWD__IS_DETECTED(), REV__IS_DETECTED());
 }
 

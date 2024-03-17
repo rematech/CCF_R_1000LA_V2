@@ -31,6 +31,7 @@ int main(void)
 	Init_MCU();
 	Init_System();
 
+	printf("start");
     while (1) 
     {
 		timer10msLoop();
@@ -50,7 +51,6 @@ void timer10msLoop()
 
 		Wireless_Check();
 		FM_Check();
-
 
 
 		Systime.Flag_10ms = 0;
@@ -83,7 +83,8 @@ void timer1000msLoop()
 		PrintParameter();
 
 		
-
+		//printf("1sec");
+		printf("adc: %d %d %d %d %d ", g_Data.readADC.FWD, g_Data.readADC.REV, g_Data.readADC.FM, g_Data.readADC.FWD2_AMP, g_Data.readADC.REV2_AMP);
 		Systime.Flag_1000ms = 0;
 	}
 }

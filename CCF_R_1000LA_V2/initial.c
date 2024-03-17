@@ -152,6 +152,9 @@ void Init_System(void)
 
 	USART1_InitialData();
 
+	if(!eeprom_read_All(&g_Data.eep))
+		Factory_Reset_Data();
+
 #else
 	FWD_LED_OFF;
 	REV_LED_OFF;
@@ -166,6 +169,7 @@ void Init_System(void)
 void Factory_Reset_Data(void)
 {
 #if 1
+	printf("factory reset");
 	g_Data.eep.uiLock_count = 2;
 	g_Data.eep.uiUnlock_count = 5;
 
@@ -180,6 +184,9 @@ void Factory_Reset_Data(void)
 	setDetectLevel_REV(WIRELESS_REV_DET_LEVEL, WIRELESS_REV2_AMP_OUT_LEVEL);
 	setDetectLevel_FM(FM_AGC_LEVEL);
 
+	g_Data.eep.uiSWVersion = Main_SW_VER;
+
+	eeprom_write_All();
 	
 #else
 	Sys.Version = Main_SW_VER;

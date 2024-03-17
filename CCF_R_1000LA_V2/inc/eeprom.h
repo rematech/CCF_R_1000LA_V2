@@ -39,4 +39,9 @@ void Eep_Data_Read(void);
 void Eep_Write(uint addr, uchar data);
 uchar Eep_Read(uint addr);
 
+
+void eeprom_write_All();
+bool eeprom_read_All(EEPROM_MAP *data) ;
+
+
 #endif

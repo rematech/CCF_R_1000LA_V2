@@ -44,7 +44,7 @@ void setSwitch_REV2(BOOL bRF1)
 
 void setLED_FWD(BOOL bLEDOn)
 {
-	if(bLEDOn)
+	if(!bLEDOn)
 		SET_BIT(PORTF, 0);
 	else
 		CLEAR_BIT(PORTF, 0);
@@ -52,7 +52,7 @@ void setLED_FWD(BOOL bLEDOn)
 
 void setLED_REV(BOOL bLEDOn)
 {
-	if(bLEDOn)
+	if(!bLEDOn)
 		SET_BIT(PORTF, 1);
 	else
 		CLEAR_BIT(PORTF, 1);
@@ -60,7 +60,7 @@ void setLED_REV(BOOL bLEDOn)
 
 void setLED_FM(BOOL bLEDOn)
 {
-	if(bLEDOn)
+	if(!bLEDOn)
 		SET_BIT(PORTF, 2);
 	else
 		CLEAR_BIT(PORTF, 2);

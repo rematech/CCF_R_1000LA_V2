@@ -2,6 +2,7 @@
 
 
 STR_UART_PROTOCOL g_uart;
+int toupper(int ch);
 
 void USART1_RXC_interrupt(void);
 ISR(USART1_RX_vect)
@@ -27,7 +28,7 @@ void USART1_InitialData()
 	g_uart.ucRecieveCount = 0;
 }
 
-#define HEX_TO_NUM(X)			(X>'a'?X-'a':(X>'A'?X-'A':X-'0'))
+#define HEX_TO_NUM(X)			(X>='a'?X-'a'+10:(X>='A'?X-'A'+10:X-'0'))
 void USART1_RXC_interrupt(void)
 {
 	cli();
@@ -99,7 +100,8 @@ void USART1_Parse()
 }
 
 
-int toupper(int ch) {
+int toupper(int ch)
+{
     if (ch >= 'a' && ch <= 'z')		// 소문자인 경우 대문자로 변환
 	{	
         return ch - 'a' + 'A';
@@ -112,6 +114,7 @@ int toupper(int ch) {
 void CommandProcess()
 {
 	uchar ucCmd;
+	bool bUpdateEEP = 0;
 
 	USART1_Parse();
 	if( !g_bRCommand )
@@ -144,32 +147,39 @@ void CommandProcess()
 			break;
 		case __U1CMD__SET_FWD_:
 			g_Data.eep.detectLevel.FWD = g_iCmdData;
+			bUpdateEEP = 1;
 			printf("SetFWD_Lvl : %d\r\n", g_Data.eep.detectLevel.FWD);
 			break;
 		case __U1CMD__SET_REV_:
 			g_Data.eep.detectLevel.REV = g_iCmdData;
+			bUpdateEEP = 1;
 			printf("SetREV_Lvl : %d\r\n", g_Data.eep.detectLevel.REV);
 			break;
 		case __U1CMD__SET_FM_:
 			g_Data.eep.detectLevel.FM = g_iCmdData;
+			bUpdateEEP = 1;
 			printf("SetFm_Lvl : %d\r\n", g_Data.eep.detectLevel.FM);
 			break;
 		case __U1CMD__SET_FWD_UTO_:
 			g_Data.eep.uto.FWD = g_iCmdData;
+			bUpdateEEP = 1;
 			printf("SetFm_Undetect Threshold Lvl : %d\r\n", g_Data.eep.uto.FWD);
 			break;
 		case __U1CMD__SET_REV_UTO_:
 			g_Data.eep.uto.REV = g_iCmdData;
+			bUpdateEEP = 1;
 			printf("SetFm_Undetect Threshold Lvl : %d\r\n", g_Data.eep.uto.REV);
 			break;
 		case __U1CMD__SET_DIRECTION_SW:
 			break;
 		case __U1CMD__MAX_UNLOCK_COUNT:
 			g_Data.eep.uiUnlock_count = g_iCmdData;
+			bUpdateEEP = 1;
 			printf("Unlock Count : %d\r\n", g_Data.eep.uiUnlock_count);
 			break;
 		case __U1CMD__MAX_LOCK_COUNT:
 			g_Data.eep.uiLock_count = g_iCmdData;
+			bUpdateEEP = 1;
 			printf("Lock Count : %d\r\n", g_Data.eep.uiLock_count);
 			break;
 
@@ -193,6 +203,10 @@ void CommandProcess()
 			break;
 			
 	}
+
+	if(bUpdateEEP)
+		eeprom_write_All();
+
 
 	printf("Cmd_Int : %d", g_iCmdData);
 

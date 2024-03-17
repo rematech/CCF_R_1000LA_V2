@@ -32,7 +32,7 @@
 
 
 
-#define Main_SW_VER			0x2C
+#define Main_SW_VER			0x30
 
 
 #define USE_FM				0

@@ -1,4 +1,7 @@
 #include "board.h"
+#include <avr/eeprom.h>
+
+uchar calculateChecksum(EEPROM_MAP *data);
 
 void Eep_1st_Write(void)
 {
@@ -80,3 +83,80 @@ void Eep_Write(uint Adr,uchar Val)
 	delay_ms(1);
 }
 
+
+
+void eeprom_write_bytes(uint16_t address, uint8_t* data, uint16_t length) 
+{
+    for (uint16_t i = 0; i < length; i++) {
+        eeprom_write_byte((uint8_t*)(address + i), data[i]);
+    }
+}
+
+void eeprom_read_bytes(uint16_t address, uint8_t* data, uint16_t length)
+{
+    for (uint16_t i = 0; i < length; i++) {
+        data[i] = eeprom_read_byte((uint8_t*)(address + i));
+    }
+}
+
+void eeprom_write_All()
+{
+	g_Data.eep.ucChecksum = calculateChecksum(&g_Data.eep);
+
+	eeprom_write_bytes(0, (uint8_t*)&g_Data.eep, sizeof(EEPROM_MAP));
+}
+
+bool eeprom_read_All(EEPROM_MAP *data) 
+{
+	uchar ucChecksum;
+	EEPROM_MAP *eeprom_data_ptr;
+	
+	
+    eeprom_data_ptr = (EEPROM_MAP *)0;
+
+    for (size_t i = 0; i < sizeof(EEPROM_MAP); ++i) {
+        ((uchar *)data)[i] = eeprom_read_byte((uchar *)(eeprom_data_ptr) + i);
+    }
+
+	ucChecksum = calculateChecksum(data);
+
+	if(data->uiSWVersion != Main_SW_VER)
+	{
+		printf("SW Version Diff!!");
+		return 0;
+	}
+
+	if(ucChecksum != data->ucChecksum)
+	{
+		printf("eeprom checksum error!!");
+		return 0;
+	}
+	
+	printf("eeprom checksum ok!!");
+	return 1;
+	
+}
+
+uchar calculateChecksum(EEPROM_MAP *data)
+{
+    unsigned char *ptr = (unsigned char *)data;
+    data->ucChecksum = 0;
+
+    for (size_t i = 0; i < sizeof(EEPROM_MAP)-1; ++i)
+	{
+        data->ucChecksum ^= ptr[i];
+    }
+
+	return data->ucChecksum;
+}
+
+uchar readChecksumFromEEPROM()
+{
+	EEPROM_MAP *eeprom_data_ptr;
+	uchar ucChecksum;
+	
+	eeprom_data_ptr = (EEPROM_MAP *)0;
+	ucChecksum = eeprom_read_byte(&eeprom_data_ptr->ucChecksum);
+
+	return ucChecksum;
+}
