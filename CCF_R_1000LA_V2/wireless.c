@@ -38,6 +38,33 @@ void setDetectLevel_FM(uint uiLevel)
 #define REV__DETECT_SIGNAL()				( g_Data.detectCount.REV >= g_Data.eep.uiLock_count )
 
 
+#define _REV_RECHECK__1ST		180
+#define _REV_RECHECK__2ND		150
+#define _REV_RECHECK__FWD1		589
+#define _REV_RECHECK__FWD2		580
+
+BOOL Recheck_REV()
+{
+	if(g_Data.eep.detectLevel.REV >= _REV_RECHECK__1ST)
+		return 1;
+	
+	if(g_Data.readADC.REV >= _REV_RECHECK__1ST )
+		return 1;
+	else if(g_Data.readADC.REV >= _REV_RECHECK__2ND )
+	{
+		if(g_Data.readADC.FWD <= _REV_RECHECK__FWD1)
+			return 0;
+	}
+	else
+	{
+		if(g_Data.readADC.FWD <= _REV_RECHECK__FWD2)
+			return 0;
+	}
+
+	return 0;
+}
+
+
 void Wireless_Check()
 {
 	switch(g_Data.ucCurrentCheckMode)
@@ -58,6 +85,7 @@ void Wireless_Check()
 				if(FWD__UNDETECTED_SIGNAL())
 				{
 					FWD__SET_STATUS(0);
+					Wireless_Mute(1);
 				}
 				
 			}
@@ -99,6 +127,7 @@ void Wireless_Check()
 				if(REV__UNDETECTED_SIGNAL())
 				{
 					REV__SET_STATUS(0);
+					Wireless_Mute(1);
 				}
 				
 			}
@@ -115,6 +144,12 @@ void Wireless_Check()
 					{
 						REV__SET_STATUS(1);
 						Wireless_ModeChange(CM_REV);
+
+						if(!Recheck_REV())
+						{
+							REV__SET_STATUS(0);
+							Wireless_Mute(1);
+						}
 					}
 				}
 				
@@ -211,10 +246,10 @@ void Wireless_Mute(uchar mute)
 	{
 		DEBUGF(MCU_DEBUG, ("Wireless>> Mute On...\r\n"));
 
-		setSwitch_REV1(0);
-		setSwitch_FWD1(0);
-		setSwitch_REV2(1);
-		setSwitch_FWD2(1);
+		setSwitch_REV1(1);
+		setSwitch_FWD1(1);
+		setSwitch_REV2(0);
+		setSwitch_FWD2(0);
 
 		setLED_FWD(0);
 		setLED_REV(0);
@@ -224,6 +259,8 @@ void Wireless_Mute(uchar mute)
 		DEBUGF(MCU_DEBUG, ("Wireless>> Mute Off...\r\n"));
 
 	}
+
+	delay_ms(100);
 }
 
 

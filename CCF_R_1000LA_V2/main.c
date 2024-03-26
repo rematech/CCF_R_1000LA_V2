@@ -45,6 +45,9 @@ int main(void)
 
 void timer10msLoop()
 {
+	if(g_Data.ucDebug)
+		return;
+	
 	if(Systime.Flag_10ms)
 	{
 		ADC_All_Read();
@@ -74,17 +77,26 @@ void timer1000msLoop()
 {	
 	if(Systime.Flag_1000ms)
 	{
-		//ucTemp++;
-		
-		//setLED_FWD(ucTemp%2);
-		//setLED_REV(ucTemp%2);
-		//setLED_FM(ucTemp%2);
+
 		CommandProcess();
-		PrintParameter();
+
+
+		if(g_Data.ucDebug)
+		{
+			ADC_All_Read();
+
+
+			if(g_Data.ucForceFWD)
+				Wireless_Direction_Set(CM_FWD);
+			else if(g_Data.ucForceREV)
+				Wireless_Direction_Set(CM_REV);
+		
+			PrintParameter();
+		}
 
 		
 		//printf("1sec");
-		printf("adc: %d %d %d %d %d ", g_Data.readADC.FWD, g_Data.readADC.REV, g_Data.readADC.FM, g_Data.readADC.FWD2_AMP, g_Data.readADC.REV2_AMP);
+		//printf("adc: %d %d %d %d %d ", g_Data.readADC.FWD, g_Data.readADC.REV, g_Data.readADC.FM, g_Data.readADC.FWD2_AMP, g_Data.readADC.REV2_AMP);
 		Systime.Flag_1000ms = 0;
 	}
 }

@@ -112,6 +112,8 @@ typedef struct
 
 	uchar ucDebug;
 	uchar ucPrint;
+	uchar ucForceFWD;
+	uchar ucForceREV;
 	////EEPROM MAP START
 	EEPROM_MAP eep;
 

@@ -95,6 +95,11 @@ extern STR_UART_PROTOCOL g_uart;
 #define __U1CMD__DEBUG_RESET			'Q'
 #define __U1CMD__F_INIT					'I'
 #define __U1CMD__PRINT_EEPROM			'R'
+
+#define __U1CMD__FORCE_FWD				'Y'
+#define __U1CMD__FORCE_REV				'Z'
+
+
 ////////////////////////////////////////////////////
 
 typedef enum 

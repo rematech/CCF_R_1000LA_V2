@@ -154,6 +154,11 @@ void Init_System(void)
 
 	if(!eeprom_read_All(&g_Data.eep))
 		Factory_Reset_Data();
+		
+	Wireless_Mute(1);
+
+	g_Data.ucForceFWD = 0;
+	g_Data.ucForceREV = 0;
 
 #else
 	FWD_LED_OFF;
@@ -182,9 +187,17 @@ void Factory_Reset_Data(void)
 
 	setDetectLevel_FWD(WIRELESS_FWD_DET_LEVEL, WIRELESS_FWD2_AMP_OUT_LEVEL);
 	setDetectLevel_REV(WIRELESS_REV_DET_LEVEL, WIRELESS_REV2_AMP_OUT_LEVEL);
-	setDetectLevel_FM(FM_AGC_LEVEL);
+	setDetectLevel_FM(FM_ADC_LEVEL);
 
 	g_Data.eep.uiSWVersion = Main_SW_VER;
+
+	g_Data.eep.uto.FWD = 0;
+	g_Data.eep.uto.REV = 0;
+	g_Data.ucForceFWD = 0;
+	g_Data.ucForceREV = 0;
+
+	
+	g_Data.ucDebug = 0;
 
 	eeprom_write_All();
 	

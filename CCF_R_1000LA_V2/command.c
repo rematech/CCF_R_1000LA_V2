@@ -111,6 +111,21 @@ int toupper(int ch)
     }
 }
 
+void EnterDebugMode()
+{
+	g_Data.ucDebug = 1;
+	Wireless_Mute(1);
+}
+
+void ReleaseDebugMode()
+{
+	g_Data.ucDebug = 0;
+	g_Data.ucForceFWD = 0;
+	g_Data.ucForceREV = 0;
+	
+	Wireless_Mute(1);
+}
+
 void CommandProcess()
 {
 	uchar ucCmd;
@@ -148,26 +163,36 @@ void CommandProcess()
 		case __U1CMD__SET_FWD_:
 			g_Data.eep.detectLevel.FWD = g_iCmdData;
 			bUpdateEEP = 1;
+			EnterDebugMode();
+			
 			printf("SetFWD_Lvl : %d\r\n", g_Data.eep.detectLevel.FWD);
 			break;
 		case __U1CMD__SET_REV_:
 			g_Data.eep.detectLevel.REV = g_iCmdData;
 			bUpdateEEP = 1;
+			EnterDebugMode();
+			
 			printf("SetREV_Lvl : %d\r\n", g_Data.eep.detectLevel.REV);
 			break;
 		case __U1CMD__SET_FM_:
 			g_Data.eep.detectLevel.FM = g_iCmdData;
 			bUpdateEEP = 1;
+			EnterDebugMode();
+			
 			printf("SetFm_Lvl : %d\r\n", g_Data.eep.detectLevel.FM);
 			break;
 		case __U1CMD__SET_FWD_UTO_:
 			g_Data.eep.uto.FWD = g_iCmdData;
 			bUpdateEEP = 1;
+			EnterDebugMode();
+			
 			printf("SetFm_Undetect Threshold Lvl : %d\r\n", g_Data.eep.uto.FWD);
 			break;
 		case __U1CMD__SET_REV_UTO_:
 			g_Data.eep.uto.REV = g_iCmdData;
 			bUpdateEEP = 1;
+			EnterDebugMode();
+			
 			printf("SetFm_Undetect Threshold Lvl : %d\r\n", g_Data.eep.uto.REV);
 			break;
 		case __U1CMD__SET_DIRECTION_SW:
@@ -175,31 +200,55 @@ void CommandProcess()
 		case __U1CMD__MAX_UNLOCK_COUNT:
 			g_Data.eep.uiUnlock_count = g_iCmdData;
 			bUpdateEEP = 1;
+			EnterDebugMode();
+			
 			printf("Unlock Count : %d\r\n", g_Data.eep.uiUnlock_count);
 			break;
 		case __U1CMD__MAX_LOCK_COUNT:
 			g_Data.eep.uiLock_count = g_iCmdData;
 			bUpdateEEP = 1;
+			EnterDebugMode();
+			
 			printf("Lock Count : %d\r\n", g_Data.eep.uiLock_count);
 			break;
 
 		case __U1CMD__PRINT_EN:
 			g_Data.ucPrint = 1;
+			EnterDebugMode();
+			break;
+		case __U1CMD__FORCE_FWD:
+			g_Data.ucPrint = 1;
+			EnterDebugMode();
+
+			g_Data.ucForceFWD = 1;
+			g_Data.ucForceREV = 0;
+			break;
+		case __U1CMD__FORCE_REV:
+			g_Data.ucPrint = 1;
+			EnterDebugMode();
+
+			g_Data.ucForceFWD = 0;
+			g_Data.ucForceREV = 1;
 			break;
 		case __U1CMD__PRINT_DIS:
 			g_Data.ucPrint = 0;
+			ReleaseDebugMode();
 			break;
 		case __U1CMD__DEBUG_RESET:
-			g_Data.ucDebug = 0;
+			g_Data.ucPrint = 0;
+			ReleaseDebugMode();
 			break;
 		case __U1CMD__F_INIT:
+			Factory_Reset_Data();
+			ReleaseDebugMode();
 			break;
 		case __U1CMD__PRINT_EEPROM:
 			printf("< EEPROM > \r\n");
-			printf("FWD Det : %d\r\n", g_Data.eep.detectLevel.FWD);
-			printf("REV Det : %d\r\n", g_Data.eep.detectLevel.REV);
-			printf("FM Det : %d\r\n", g_Data.eep.detectLevel.FM);
-			printf("unDet threshold offset : FWD: %d  REV: %d\r\n", g_Data.eep.uto.FWD, g_Data.eep.uto.REV);
+			printf("FWD Det : %d \r\n", g_Data.eep.detectLevel.FWD);
+			printf("REV Det : %d \r\n", g_Data.eep.detectLevel.REV);
+			printf("FM Det : %d \r\n", g_Data.eep.detectLevel.FM);
+			printf("Lock Count: %d  UnLock_Count: %d  \r\n", g_Data.eep.uiLock_count, g_Data.eep.uiUnlock_count);
+			printf("unDet threshold offset : FWD: %d  REV: %d \r\n", g_Data.eep.uto.FWD, g_Data.eep.uto.REV);
 			break;
 			
 	}
@@ -208,7 +257,7 @@ void CommandProcess()
 		eeprom_write_All();
 
 
-	printf("Cmd_Int : %d", g_iCmdData);
+	//printf("Cmd_Int : %d", g_iCmdData);
 
 }
 
@@ -216,10 +265,10 @@ void PrintParameter()
 {
 	if(g_Data.ucPrint)
 	{
-		printf("< Detect Level >\r\n");
-		printf("FWD : %d, REV: %d, FM : %d", g_Data.eep.detectLevel.FWD, g_Data.eep.detectLevel.REV, g_Data.eep.detectLevel.FM);
-		printf("Count>> Lock %d, unLock : %d", g_Data.eep.uiLock_count, g_Data.eep.uiUnlock_count);
-		printf("unDetect Threshod Offset>> FWD: %d, REV : %d \r\n", g_Data.eep.uto.FWD, g_Data.eep.uto.REV);
+		//printf("< Detect Level >\r\n");
+		printf("ADC>> FWD : %d, REV: %d, FM : %d //AMP FWD: %d REV: %d", g_Data.readADC.FWD, g_Data.readADC.REV, g_Data.readADC.FM, g_Data.readADC.FWD2_AMP, g_Data.readADC.REV2_AMP);
+		//printf("Count>> Lock %d, unLock : %d", g_Data.eep.uiLock_count, g_Data.eep.uiUnlock_count);
+		//printf("unDetect Threshod Offset>> FWD: %d, REV : %d \r\n", g_Data.eep.uto.FWD, g_Data.eep.uto.REV);
 	}
 }
 
